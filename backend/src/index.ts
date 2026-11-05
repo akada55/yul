@@ -1,14 +1,16 @@
+import cors from 'cors';
 import express from 'express';
+import helmet from 'helmet';
+import { app } from './app.js';
+import { env } from './config/env.js';
 
-const app = express();
-const port = Number(process.env.PORT ?? 3000);
+const server = express();
+server.disable('x-powered-by');
+server.use(helmet());
+server.use(cors({ origin: env.frontendOrigins }));
+server.use(express.json({ limit: '1mb' }));
+server.use(app);
 
-app.use(express.json());
-
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
-
-app.listen(port, () => {
-  console.log(`API server listening on http://localhost:${port}`);
+server.listen(env.port, () => {
+  console.log(`API server listening on http://localhost:${env.port}`);
 });
